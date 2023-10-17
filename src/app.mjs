@@ -40,6 +40,12 @@ const backlinksArray = [
     "random-website5.com",
 ];
 
+/**
+ * 
+ * @param {Number} x - lower bound inclusive
+ * @param {Number} y - upper bound inclusive
+ * @returns {Number} random number between x,y inclusive
+ */
 function getRandomNumberBetween(x, y) {
     // Use Math.floor() to make sure the result is an integer
     return Math.floor(Math.random() * (y - x + 1)) + x;
@@ -81,12 +87,6 @@ export const lambdaHandler = async (event, context) => {
             } catch (err) {
                 console.log("Error", err);
             }
-
-            //             {
-            //                 "businessName": "Random Name",
-            //                     "textBody": "Some random text that will be used to populate a promotion (10-70 chars max).",
-            //                         "backlink": "random-website.com",
-            // }
 
             const response = {
                 'statusCode': 200,
