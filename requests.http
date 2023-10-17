@@ -1,0 +1,3 @@
+GET https://e34zimyozb.execute-api.us-east-1.amazonaws.com/Prod/ad/
+Content-Type: application/json
+

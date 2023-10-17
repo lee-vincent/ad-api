@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ad-api
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  AdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BusinessNameTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AdTextTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BacklinksTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          BUSINESS_NAME_TABLE: !Ref BusinessNameTable
+          AD_TEXT_TABLE: !Ref AdTextTable
+          BACKLINKS_TABLE: !Ref BacklinksTable
+      Events:
+        GetAdAPI:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /ad
+            Method: GET
+  BusinessNameTable:
+    Type: 'AWS::DynamoDB::Table'
+    Metadata:
+      SamResourceId: BusinessNameTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      PointInTimeRecoverySpecification: 
+        PointInTimeRecoveryEnabled: true
+      ImportSourceSpecification:
+          InputCompressionType: NONE
+          InputFormat: CSV
+          S3BucketSource: 
+            S3Bucket: dynamodb-ad-api-businessnames
+  AdTextTable:
+    Type: 'AWS::DynamoDB::Table'
+    Metadata:
+      SamResourceId: AdTextTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      PointInTimeRecoverySpecification: 
+        PointInTimeRecoveryEnabled: true
+      ImportSourceSpecification:
+          InputCompressionType: NONE
+          InputFormat: CSV
+          S3BucketSource: 
+            S3Bucket: dynamodb-ad-api-adtext
+  BacklinksTable:
+    Type: 'AWS::DynamoDB::Table'
+    Metadata:
+      SamResourceId: BacklinksTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      PointInTimeRecoverySpecification: 
+        PointInTimeRecoveryEnabled: true
+      ImportSourceSpecification:
+          InputCompressionType: NONE
+          InputFormat: CSV
+          S3BucketSource: 
+            S3Bucket: dynamodb-ad-api-backlinks
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  AdApi:
+    Description: "API Gateway endpoint URL for Prod stage for Ad function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ad/"
+  AdFunction:
+    Description: "Ad Lambda Function ARN"
+    Value: !GetAtt AdFunction.Arn
+  AdFunctionIamRole:
+    Description: "Implicit IAM Role created for Ad function"
+    Value: !GetAtt AdFunction.Arn
