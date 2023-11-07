@@ -38,6 +38,7 @@ Resources:
           Properties:
             Path: /ad
             Method: GET
+
   BusinessNameTable:
     Type: 'AWS::DynamoDB::Table'
     Metadata:

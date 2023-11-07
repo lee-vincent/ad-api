@@ -75,6 +75,7 @@ export const lambdaHandler = async (event, context) => {
             const businessNameId = getRandomNumberBetween(0, businessNamesArray.length - 1);
             const adTextId = getRandomNumberBetween(0, adTextArray.length - 1);
             const backlinkId = getRandomNumberBetween(0, backlinksArray.length - 1);
+            const allowedDomain = '*';
 
             console.log("businessNameId: ", businessNameId);
             console.log("adTextId: ", adTextId);
@@ -90,6 +91,9 @@ export const lambdaHandler = async (event, context) => {
 
             const response = {
                 'statusCode': 200,
+                headers: {
+                    "Access-Control-Allow-Origin": allowedDomain, // Specify the domain you want to allow
+                },
                 'body': JSON.stringify(
                     {
                         "businessName": businessName,
